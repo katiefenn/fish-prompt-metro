@@ -1,34 +1,5 @@
 function fish_prompt
     set -l status_copy $status
-    set -l pwd_info (pwd_info "/")
-    set -l dir
-    set -l base
-    set -l base_color 888 161616
-
-    if test "$PWD" = ~
-        set base "~"
-
-    else if pwd_is_home
-        set dir "~/"
-    else
-        if test "$PWD" != /
-            set dir "/"
-        end
-
-        set base (set_color red)"/"
-    end
-
-    if test ! -z "$pwd_info[1]"
-        set base "$pwd_info[1]"
-    end
-
-    if test ! -z "$pwd_info[2]"
-        set dir "$dir$pwd_info[2]/"
-    end
-
-    if test ! -z "$pwd_info[3]"
-        segment $base_color " $pwd_info[3] "
-    end
 
     if set branch_name (git_branch_name)
         set -l git_color black green
@@ -73,48 +44,10 @@ function fish_prompt
         end
     end
 
-    segment $base_color " $dir"(set_color white)"$base "
-
-    if test ! -z "$SSH_CLIENT"
-        set -l color bbb 222
-
-        if test 0 -eq (id -u "$USER")
-            set color red 222
-        end
-
-        segment $color (host_info " usr@host ")
-
-    else if test 0 -eq (id -u "$USER")
-        segment red 222 " \$ "
-    end
-
-    if test "$status_copy" -ne 0
-        segment red white (set_color -o)" ! "(set_color normal)
-
-    else if last_job_id > /dev/null
-        segment white 333 " %% "
-    end
-
-    if [ "$theme_display_virtualenv" != 'no' ]; and set -q VIRTUAL_ENV
-        segment yellow blue " "(basename "$VIRTUAL_ENV")" "
-    end
-
-    if [ "$theme_display_ruby" != 'no' ]; and set -q RUBY_VERSION
-        segment red fff " "(basename "$RUBY_VERSION")" "
-    end
-
-    if test "$fish_key_bindings" = "fish_vi_key_bindings"
-      switch $fish_bind_mode
-        case default
-          segment white red "[N]"
-        case insert
-          segment black green "[I]"
-        case replace-one
-          segment yellow blue "[R]"
-        case visual
-          segment white magenta "[V]"
-      end
-    end
+    segment black yellow " $PWD "
+    segment white red " $USER "
 
     segment_close
+    printf "\n"
+    date "+%H:%M:%S > "
 end
